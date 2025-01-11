@@ -33,7 +33,11 @@ public class UserRepository {
     }
 
     public User findByUsername(String username) {
-        return jdbcTemplate.queryForObject("SELECT id, name, password, role FROM \"USER\" WHERE name = ?", rowMapper, username);
+        User user = jdbcTemplate.queryForObject("SELECT id, name, password, role FROM \"USER\" WHERE name = ?", rowMapper, username);
+        if (user == null) {
+            return new User("Unable to find user " + username);
+        }
+        return user;
     }
 
     public User save(User user) {

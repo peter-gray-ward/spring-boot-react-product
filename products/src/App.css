@@ -36,3 +36,38 @@
     transform: rotate(360deg);
   }
 }
+
+
+#authentication {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#authentication p.exception {
+  color: red;
+}
+
+#login, #register {
+  width: 50vw;
+  margin: 0 15vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#login input,
+#login label,
+#register input,
+#register label {
+  display: block;
+  text-align: left;
+}
+
+#login button, #register button {
+  margin: 1.5rem;
+  background: cadetblue;
+  color: white;
+  padding: 0.35rem;
+}

@@ -13,20 +13,6 @@ INSERT INTO "IMAGE" (id, src) VALUES
 (10, decode('FFD8FFE000104A46494600010101004800480000FFDB00430008080808080808', 'hex'));
 
 
--- Insert seed data for USER table
-INSERT INTO "USER" (id, name, password, role) VALUES
-(1, 'Alice', 'password123', 'ADMIN'),
-(2, 'Bob', 'securepass', 'CUSTOMER'),
-(3, 'Charlie', 'mypassword', 'CUSTOMER'),
-(4, 'Diana', 'passw0rd', 'ADMIN'),
-(5, 'Eve', '12345678', 'CUSTOMER'),
-(6, 'Frank', 'ilovepostgres', 'CUSTOMER'),
-(7, 'Grace', 'p@ssword', 'ADMIN'),
-(8, 'Hank', 'welcome123', 'CUSTOMER'),
-(9, 'Ivy', 'adminpassword', 'ADMIN'),
-(10, 'Jack', 'qwerty', 'CUSTOMER');
-
-
 -- Insert seed data for PRODUCT table
 INSERT INTO "PRODUCT" (id, name, price, description, image_id) VALUES
 (1, 'Laptop', 999.99, 'High-performance laptop with 16GB RAM.', 1),

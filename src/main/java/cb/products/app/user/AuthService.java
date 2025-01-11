@@ -46,58 +46,51 @@ public class AuthService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public User handleRegistration(String name, String password) {
-        String error = null;
+    public User handleRegistration(String name, String password, String role) {
+        try {
+            String sql = "SELECT COUNT(*) FROM \"USER\" WHERE name = ?";
+            
+            Integer count = jdbcTemplate.queryForObject(
+                sql, 
+                Integer.class,
+                name
+            );
 
-        if (name == null || name.isEmpty()) {
-            error = "Name is required.";
-        } else if (password == null || password.isEmpty()) {
-            error = "Password is required.";
-        }
-
-        if (error == null) {
-            try {
-                String sql = "SELECT COUNT(*) FROM public.user WHERE name = ?";
-                
-                Integer count = jdbcTemplate.queryForObject(
-                    sql, 
-                    Integer.class,
-                    name
-                );
-
-                if (count != null && count > 0) {
-                    return new User("User " + name + " already exists.");
-                }
-
-
-                sql = "INSERT INTO public.user (id, name, password) VALUES (?, ?, ?)";
-                jdbcTemplate.update(
-                    sql, 
-                    UUID.randomUUID(), 
-                    name, 
-                    PasswordUtil.hashPassword(password)
-                );
-
-                User user = userService.findByUsername(name);
-
-                return user;
-            } catch (DuplicateKeyException ex) {
-                error = "User " + name + " is already registered.";
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                error = "An error occurred during registration.";
+            if (count != null && count > 0) {
+                return new User("User " + name + " already exists.");
             }
+
+
+            sql = "INSERT INTO \"USER\" (name, password, role) VALUES (?, ?, ?)";
+            jdbcTemplate.update(
+                sql,
+                name, 
+                PasswordUtil.hashPassword(password),
+                role
+            );
+
+            User user = userService.findByUsername(name);
+
+            if (user == null) {
+                throw new Exception("...");
+            }
+
+            return user;
+        } catch (DuplicateKeyException ex) {
+            return new User("User " + name + " is already registered.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new User("An error occurred during registration.");
         }
-        return null;
     }
 
-    public User handleLogin(String name, String password) {
+    public User handleLogin(String name, String password, String role) {
         String error = null;
 
         try {
             User user = userService.findByUsername(name);
 
-            if (user ==  null) {
+            if (user == null) {
                 return new User("User " + name + " does not exist.");
             }
 
@@ -110,13 +103,17 @@ public class AuthService {
                 e.printStackTrace();
             }
 
-            if (user != null && passwordMatches) {
+            if (role.equals(user.getRole()) == false) {
+                user.setException("Incorrect role");
+                return user;
+            } else if (passwordMatches) {
                 String accessToken = UUID.randomUUID().toString();
                 user.setAccessToken(accessToken);
-
                 return user;
             } else {
                 error = "Incorrect password or name.";
+                user.setException(error);
+                return user;
             }
         } catch (EmptyResultDataAccessException e) {
             error = "User " + name + " not found.";

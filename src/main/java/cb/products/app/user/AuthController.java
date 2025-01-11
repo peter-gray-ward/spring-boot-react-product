@@ -20,20 +20,24 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User userBody, HttpSession session) {
-        User user = authService.handleRegistration(userBody.getName(), userBody.getPassword());
-        if (user.getException() != null) {
-            SessionUtil.login(session, user);
+        String name = userBody.getName();
+        String password = userBody.getPassword();
+        String role = userBody.getRole();
+        if (name != null && password != null && role != null) {
+            User user = authService.handleRegistration(name, password, role);
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
-        return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
+        System.out.println(name);
+        System.out.println(password);
+        return new ResponseEntity<>(new User("Missing parameters."), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User userBody, HttpSession session) {
 
-        User user = authService.handleLogin(userBody.getName(), userBody.getPassword());
+        User user = authService.handleLogin(userBody.getName(), userBody.getPassword(), userBody.getRole());
 
-        if (user.getException() != null) {
+        if (user.getException() == null) {
             SessionUtil.login(session, user);
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
