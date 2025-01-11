@@ -65,9 +65,52 @@
   text-align: left;
 }
 
+#authentication section {
+  display: flex;
+}
+
 #login button, #register button {
   margin: 1.5rem;
   background: cadetblue;
   color: white;
   padding: 0.35rem;
 }
+
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+}
+
+#root #banner {
+  width: 100%;
+  height: 40px;
+  background: black;
+  color: lawngreen;
+  text-align: center;
+  padding: 0.1rem;
+  font-size: 2rem;
+}
+
+#root main {
+  width: 100%;
+  height: 100%;
+}
+
+.left-panel {
+  height: 100%;
+  width: 30%;
+  background: cadetblue;
+}
+
+.left-panel h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vertical-segment {
+  margin: 0;
+}
+
+

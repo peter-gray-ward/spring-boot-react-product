@@ -25,12 +25,18 @@ function PropsReducer(state, action) {
       ...state,
       user: action.res
     }
+  case 'UPDATE_BANNER':
+    return {
+      ...state,
+      showBanner: action.showBanner
+    };
   default:
     return state;
   }
 }
 
 var props = {
+  showBanner: true,
   user: {
     id: null,
     name: null,
@@ -79,6 +85,9 @@ function App() {
         }
         setCbUser(res);
         dispatch({ type: 'LOGIN_RESPONSE', res });
+        setTimeout(() => {
+          dispatch({ type: 'UPDATE_BANNER', showBanner: false });
+        }, 3000); 
       });
       xhr.send(JSON.stringify({
         name: document.querySelector("#login input[name=username]").value,
@@ -91,8 +100,25 @@ function App() {
   return (
     <div className="App">
      {
-       cbUser ? <div>
-        Welcome, {cbUser.name}
+       cbUser ? <div id="root">
+        {
+          state.showBanner ? <div id="banner">
+            Welcome, {cbUser.name}
+          </div>  : null
+        }
+
+        <main style={{
+          height: state.showBanner ? `calc(100vh - 40px)` : `100%`
+        }}>
+          <div className="left-panel">
+            <h1 className="vertical-segment">
+              {cbUser.role} Portal
+            </h1>
+            <div className="vertical-segment">
+              Logout
+            </div>
+          </div>
+        </main>
       </div> : 
 
       <div id="authentication">
@@ -103,8 +129,10 @@ function App() {
           <input type="text" name="username" />
           <label for="password">Password:</label>
           <input type="text" name="password" />
-          <label for="role">Admin:</label>
-          <input type="checkbox" name="role" />
+          <section>
+            <label for="role">Admin:</label>
+            <input type="checkbox" name="role" />
+          </section>
           {
             (state.user.request == 'login'
             && state.user.loggedin) ? <p className="success">
@@ -126,8 +154,10 @@ function App() {
           <input type="text" name="username" />
           <label for="password">Password:</label>
           <input type="text" name="password" />
-          <label for="role">Admin:</label>
-          <input type="checkbox" name="role" />
+          <section>
+            <label for="role">Admin:</label>
+            <input type="checkbox" name="role" />
+          </section>
           {
             (state.user.request == 'register'
             && state.user.registered) ? <p className="success">
