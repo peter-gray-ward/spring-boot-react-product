@@ -59,7 +59,7 @@ function App() {
 
   const loadProducts = useMemo(() => () => {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "http://localhost:8080/products");
+    xhr.open("GET", "/products");
     xhr.withCredentials = true;
     xhr.addEventListener("load", function() {
       var res = JSON.parse(this.response);
@@ -72,7 +72,7 @@ function App() {
   const register = useMemo(() => {
     return (event) => {
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", "http://localhost:8080/register");
+      xhr.open("POST", "/register");
       xhr.setRequestHeader("content-type", "application/json");
       xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
@@ -109,7 +109,7 @@ function App() {
   const login = useMemo(() => {
     return (event) => {
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", "http://localhost:8080/login");
+      xhr.open("POST", "/login");
       xhr.setRequestHeader("content-type", "application/json");
       xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
@@ -142,7 +142,7 @@ function App() {
     }
     id = id.dataset.id;
     var xhr = new XMLHttpRequest();
-    xhr.open("DELETE", "http://localhost:8080/products/" + id);
+    xhr.open("DELETE", "/products/" + id);
     xhr.withCredentials = true;
     xhr.addEventListener("load", function() {
       var res = JSON.parse(this.response);
@@ -158,7 +158,7 @@ function App() {
 
   const addProduct = useMemo(() => event => {
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8080/products");
+    xhr.open("POST", "/products");
     xhr.withCredentials = true;
     xhr.addEventListener("load", function() {
       var product = JSON.parse(this.response);
@@ -173,7 +173,7 @@ function App() {
 
   const saveProduct = useMemo(() => event => {
     var xhr = new XMLHttpRequest();
-    xhr.open("PUT", "http://localhost:8080/products/" + product.id);
+    xhr.open("PUT", "/products/" + product.id);
     xhr.setRequestHeader("content-type", "application/json");
     xhr.withCredentials = true;
     xhr.addEventListener("load", function() {
@@ -208,7 +208,7 @@ function App() {
     var id = sessionStorage.cbUserId;
     if (access_token && id) {
       var xhr = new XMLHttpRequest();
-      xhr.open("GET", "http://localhost:8080/login/access-token/" + id + "/" + access_token);
+      xhr.open("GET", "/login/access-token/" + id + "/" + access_token);
       xhr.setRequestHeader("content-type", "application/json");
       xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
