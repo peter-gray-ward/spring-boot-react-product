@@ -54,6 +54,8 @@ var props = {
 function App() {
   const [state, dispatch] = useReducer(PropsReducer, props);
   const [cbUser, setCbUser] = useState();
+  const [product, setProduct] = useState();
+  
 
   const loadProducts = useMemo(() => () => {
     var xhr = new XMLHttpRequest();
@@ -122,6 +124,11 @@ function App() {
     }
   }, []);
 
+  const selectProduct = useMemo(() => event => {
+    var id = +event.currentTarget.id;
+    setProduct(state.products.filter(p => p.id == id)[0]);
+  }, [state.products]);
+
   // log-in with access token if exists
   useEffect(() => {
     var access_token = sessionStorage.cbAccessToken;
@@ -160,9 +167,9 @@ function App() {
             </h1>
             <ul>
               {
-                state.products.map((product, i) => {
-                  return <li key={i}>{product.name}</li>
-                })
+                cbUser.role == 'ADMIN' ? 
+                  <li>+ Add Product</li>
+                : null
               }
             </ul>
             <div className="vertical-segment">
@@ -170,6 +177,57 @@ function App() {
             </div>
           </div>
 
+
+          
+          <div id="product-view">
+            <div className="breadcrumbs">
+              {
+                product ? <>
+                  <a onClick={() => setProduct(null)}>All Products</a> <span>{">"}</span> <a>{product.name}</a>
+                </> : <a>All Products</a>
+              }
+            </div>
+            <article>
+              {
+                product 
+                ? 
+
+                  cbUser.role == 'ADMIN' 
+
+                  ? 
+                    <div id="product">
+                      
+                      <h1><input type="text" value={product.name} /></h1>
+                      <p><textarea type="text" value={product.description} /></p>
+                      <h2><span>$</span><input className="currency" type="number" value={product.price} /></h2>
+                      <section className="actions">
+                        <button>Purchase</button>
+                        <button>Remove</button>
+                      </section>
+                    </div>
+                  : 
+                    <div id="product">
+                      
+                      <h1>{product.name}</h1>
+                      <p>{product.description}</p>
+                      <h2>${product.price}</h2>
+                      <section className="actions">
+                        <button>Purchase</button>
+                      </section>
+                    </div>
+
+                :
+
+                  state.products.map((product, i) => {
+                    return <div className="product-preview" onClick={selectProduct} id={product.id}>
+                      <div className="thumbnail" style={{background:`url(http://localhost:8080/products/image/${product.imageId})`}}></div>
+                      {product.name}
+                    </div>
+                  })
+                
+              }
+            </article>
+          </div>
 
         </main>
       </div> : 

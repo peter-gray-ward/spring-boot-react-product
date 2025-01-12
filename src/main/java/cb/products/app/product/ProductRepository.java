@@ -66,4 +66,12 @@ public class ProductRepository {
     public int deleteById(Long id) {
         return jdbcTemplate.update("DELETE FROM \"PRODUCT\" WHERE id = ?", id);
     }
+
+    public byte[] findImageById(Long id) {
+        return jdbcTemplate.queryForObject(
+            "SELECT src FROM \"IMAGE\" WHERE id = ?", 
+            (rs, rowNum) -> rs.getBytes("src"),
+            id
+        );
+    }
 }

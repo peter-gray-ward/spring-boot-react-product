@@ -96,12 +96,14 @@
 #root main {
   width: 100%;
   height: 100%;
+  display: flex;
 }
 
 .left-panel {
   height: 100%;
   width: 30%;
-  background: cadetblue;
+  color: white;
+  background: rgb(22, 37, 38)
 }
 
 .left-panel h1 {
@@ -113,11 +115,12 @@
   height: 75%;
   list-style: none;
   text-align: left;
-  font-size: 2rem;
+  font-size: 1.2rem;
+  padding: 1rem;
 }
 
 .left-panel li {
-
+  color: coral;
 }
 
 .left-panel li:hover {
@@ -129,4 +132,105 @@
   margin: 0;
 }
 
+#product-view {
+  width: 70%;
+  background: rgb(129, 212, 215);
+  display: flex;
+  flex-direction: column;
+}
 
+#product-view .breadcrumbs {
+  width: 100%;
+  height: 3rem;
+  background: transparent;
+  text-indent: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+#product-view .breadcrumbs a {
+  
+}
+
+#product-view .breadcrumbs a:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#product-view article {
+  height: calc(100% - 3rem);
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  overflow: auto;
+  transform-style: preserve-3d
+}
+
+#product-view article div#product {
+  width: 100%;
+  height: 100%;
+  background: whitesmoke;
+  display: flex
+;
+  flex-direction: column;
+  align-items: start;
+  padding: 1rem;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+#product p, #product h1 {
+  width: 90%;
+  text-align: left;
+}
+
+#product h1, #product h1 input {
+  font-size: 2rem;
+}
+
+#product textarea {
+  width: 80%;
+}
+
+#product input {
+  width: 100%;
+}
+
+#product h2 {
+  display: flex;
+}
+
+#product h2, #product h2 input {
+  font-size: 1.5rem;
+}
+
+.product-preview {
+  box-sizing: border-box;
+  width: calc(70vw / 3);
+  height: calc(70vw / 3);
+  background: black;
+  color: white;
+  outline: 1px solid white;
+  perspective: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s linear all;
+}
+
+.product-preview:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+#product .actions {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+#product .actions button {
+  margin-right: .5rem
+}

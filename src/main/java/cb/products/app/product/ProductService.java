@@ -31,4 +31,8 @@ public class ProductService {
     public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
+
+    public byte[] findImageById(Long id) {
+        return productRepository.findImageById(id);
+    }
 }
