@@ -91,6 +91,12 @@ function App() {
     }
   }, []);
 
+  const logout = useMemo(() => () => {
+    delete sessionStorage.cbUserId;
+    delete sessionStorage.cbAccessToken;
+    window.location.reload();
+  }, [cbUser]);
+
   const loadApp = useMemo(() => (user) => {
     user.loggedin = user.name + " is now successfully logged in.";
     setCbUser(user);
@@ -128,6 +134,73 @@ function App() {
     var id = +event.currentTarget.id;
     setProduct(state.products.filter(p => p.id == id)[0]);
   }, [state.products]);
+
+  const removeProduct = useMemo(() => event => {
+    var id = event.currentTarget;
+    while (id.id !== 'product') {
+      id = id.parentElement;
+    }
+    id = id.dataset.id;
+    var xhr = new XMLHttpRequest();
+    xhr.open("DELETE", "http://localhost:8080/products/" + id);
+    xhr.withCredentials = true;
+    xhr.addEventListener("load", function() {
+      var res = JSON.parse(this.response);
+      console.log("deleted? ", res);
+      if (new Boolean(res)) {
+        state.products = state.products.filter(p => p.id !== +id);
+        dispatch({ type: 'LOAD_PRODUCTS', products: state.products });
+        setProduct(null);
+      }
+    });
+    xhr.send();
+  }, [state.products]);
+
+  const addProduct = useMemo(() => event => {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:8080/products");
+    xhr.withCredentials = true;
+    xhr.addEventListener("load", function() {
+      var product = JSON.parse(this.response);
+      if (product.id) {
+        state.products.push(product);
+        dispatch({ type: 'LOAD_PRODUCTS', products: state.products });
+        setProduct(product);
+      }
+    });
+    xhr.send();
+  }, [state.products]);
+
+  const saveProduct = useMemo(() => event => {
+    var xhr = new XMLHttpRequest();
+    xhr.open("PUT", "http://localhost:8080/products/" + product.id);
+    xhr.setRequestHeader("content-type", "application/json");
+    xhr.withCredentials = true;
+    xhr.addEventListener("load", function() {
+      var product = JSON.parse(this.response);
+      if (product.id) {
+        state.products = state.products.map(p => {
+          if (p.id == product.id) {
+            return product;
+          }
+          return p;
+        })
+        alert('Product Saved');
+        dispatch({ type: 'LOAD_PRODUCTS', products: state.products });
+        setProduct(product);
+      }
+    });
+    xhr.send(JSON.stringify(product));
+  }, [product]);
+
+  const handleProductInputChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    setProduct((prevProduct) => ({
+        ...prevProduct,
+        [name]: name === 'price' ? parseFloat(value) || 0.0 : value, // Convert price to a number
+    }));
+  };
 
   // log-in with access token if exists
   useEffect(() => {
@@ -168,12 +241,12 @@ function App() {
             <ul>
               {
                 cbUser.role == 'ADMIN' ? 
-                  <li>+ Add Product</li>
+                  <li onClick={addProduct}>+ Add Product</li>
                 : null
               }
             </ul>
             <div className="vertical-segment">
-              Logout
+              <a id="logout" onClick={logout}>Logout</a>
             </div>
           </div>
 
@@ -195,14 +268,15 @@ function App() {
                   cbUser.role == 'ADMIN' 
 
                   ? 
-                    <div id="product">
+                    <div id="product" data-id={product.id}>
                       
-                      <h1><input type="text" value={product.name} /></h1>
-                      <p><textarea type="text" value={product.description} /></p>
-                      <h2><span>$</span><input className="currency" type="number" value={product.price} /></h2>
+                      <h1><input onChange={handleProductInputChange} type="text" name="name" value={product.name} /></h1>
+                      <p><textarea onChange={handleProductInputChange} type="text" name="description" value={product.description} /></p>
+                      <h2><span>$</span><input onChange={handleProductInputChange} name="price" className="currency" type="number" value={product.price} /></h2>
                       <section className="actions">
                         <button>Purchase</button>
-                        <button>Remove</button>
+                        <button onClick={removeProduct}>Remove</button>
+                        <button onClick={saveProduct}>save</button>
                       </section>
                     </div>
                   : 
@@ -220,7 +294,7 @@ function App() {
 
                   state.products.map((product, i) => {
                     return <div className="product-preview" onClick={selectProduct} id={product.id}>
-                      <div className="thumbnail" style={{background:`url(http://localhost:8080/products/image/${product.imageId})`}}></div>
+                      <div className="thumbnail"></div>
                       {product.name}
                     </div>
                   })

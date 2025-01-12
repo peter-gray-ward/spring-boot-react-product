@@ -20,6 +20,10 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
+    public Product save() {
+        return productRepository.create();
+    }
+
     public Product save(Product product) {
         return productRepository.save(product);
     }
@@ -28,8 +32,8 @@ public class ProductService {
         return productRepository.update(product);
     }
 
-    public void deleteById(Long id) {
-        productRepository.deleteById(id);
+    public boolean deleteById(Long id) {
+        return productRepository.deleteById(id);
     }
 
     public byte[] findImageById(Long id) {

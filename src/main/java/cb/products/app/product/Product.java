@@ -7,6 +7,8 @@ public class Product {
     private double price;
     private int imageId;
 
+    public Product() {}
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

@@ -35,19 +35,19 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productService.save(product);
+    public Product createProduct() {
+        return productService.save();
     }
 
     @PutMapping("/{id}")
     public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        product.setId(id);
-        return productService.save(product);
+        return productService.update(product);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
-        productService.deleteById(id);
+    public ResponseEntity<Boolean> deleteProduct(@PathVariable Long id) {
+        boolean deleted = productService.deleteById(id);
+        return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 
     @GetMapping("/image/{imageId}")
