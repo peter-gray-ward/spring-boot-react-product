@@ -28,15 +28,15 @@ public class ProductRepository {
     };
 
     public List<Product> findAll() {
-        return jdbcTemplate.query("SELECT * FROM products", rowMapper);
+        return jdbcTemplate.query("SELECT * FROM \"PRODUCT\"", rowMapper);
     }
 
     public Product findById(Long id) {
-        return jdbcTemplate.queryForObject("SELECT * FROM products WHERE id = ?", rowMapper, id);
+        return jdbcTemplate.queryForObject("SELECT * FROM \"PRODUCT\" WHERE id = ?", rowMapper, id);
     }
 
     public Product save(Product product) {
-        String insertSQL = "INSERT INTO products (name, price, description, image_id)";
+        String insertSQL = "INSERT INTO \"PRODUCT\" (name, price, description, image_id)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connect -> {
@@ -57,13 +57,13 @@ public class ProductRepository {
 
     public Product update(Product product) {
         jdbcTemplate.update(
-            "UPDATE products SET name = ?, price = ? WHERE id = ?",
+            "UPDATE \"PRODUCT\" SET name = ?, price = ? WHERE id = ?",
             product.getName(), product.getPrice(), product.getId()
         );
         return product;
     }
 
     public int deleteById(Long id) {
-        return jdbcTemplate.update("DELETE FROM products WHERE id = ?", id);
+        return jdbcTemplate.update("DELETE FROM \"PRODUCT\" WHERE id = ?", id);
     }
 }

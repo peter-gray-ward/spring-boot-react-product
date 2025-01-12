@@ -21,7 +21,9 @@ public class AuthFilter extends OncePerRequestFilter {
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
         "/login",
         "/register",
-        "/"
+        "/",
+        "/users",
+        "/products"
     );
 
     @Override

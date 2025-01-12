@@ -29,15 +29,26 @@ public class UserRepository {
     }
 
     public User findById(Long id) {
-        return jdbcTemplate.queryForObject("SELECT id, name, password, role FROM \"USER\" WHERE id = ?", rowMapper, id);
+        List<User> user = jdbcTemplate.query("SELECT id, name, password, role FROM \"USER\" WHERE id = ?", rowMapper, id);
+        if (user.size() == 0) {
+            return new User("Unable to find user " + id);
+        }
+        return user.get(0);
     }
 
     public User findByUsername(String username) {
-        User user = jdbcTemplate.queryForObject("SELECT id, name, password, role FROM \"USER\" WHERE name = ?", rowMapper, username);
-        if (user == null) {
+        List<User> user = jdbcTemplate.query(
+            "SELECT id, name, password, role"
+            + " FROM \"USER\""
+            + " WHERE name = ?", 
+            rowMapper, 
+            username
+        );
+        
+        if (user.size() == 0) {
             return new User("Unable to find user " + username);
         }
-        return user;
+        return user.get(0);
     }
 
     public User save(User user) {

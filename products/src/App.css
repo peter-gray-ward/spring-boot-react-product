@@ -109,6 +109,22 @@
   text-overflow: ellipsis;
 }
 
+.left-panel ul {
+  height: 75%;
+  list-style: none;
+  text-align: left;
+  font-size: 2rem;
+}
+
+.left-panel li {
+
+}
+
+.left-panel li:hover {
+  cursor: pointer;
+  font-weight: 900;
+}
+
 .vertical-segment {
   margin: 0;
 }

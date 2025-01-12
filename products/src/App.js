@@ -18,17 +18,22 @@ function PropsReducer(state, action) {
   case 'REGISTER_RESPONSE':
     return {
       ...state,
-      user: action.res
+      user: action.user
     }
   case 'LOGIN_RESPONSE':
     return {
       ...state,
-      user: action.res
+      user: action.user
     }
   case 'UPDATE_BANNER':
     return {
       ...state,
       showBanner: action.showBanner
+    };
+  case 'LOAD_PRODUCTS':
+    return {
+      ...state,
+      products: action.products
     };
   default:
     return state;
@@ -42,27 +47,39 @@ var props = {
     name: null,
     access_token: null,
     login_type: 'register'
-  }
+  },
+  products: []
 };
 
 function App() {
   const [state, dispatch] = useReducer(PropsReducer, props);
   const [cbUser, setCbUser] = useState();
 
-
+  const loadProducts = useMemo(() => () => {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "http://localhost:8080/products");
+    xhr.withCredentials = true;
+    xhr.addEventListener("load", function() {
+      var res = JSON.parse(this.response);
+      if (Array.isArray(res)) {
+        dispatch({ type: 'LOAD_PRODUCTS', products: res });
+      }
+    });
+    xhr.send();
+  })
   const register = useMemo(() => {
     return (event) => {
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "http://localhost:8080/register");
       xhr.setRequestHeader("content-type", "application/json");
+      xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
-        var res = JSON.parse(this.response);
-        res.request = 'register'
-        if (!res.exception) {
-          res.registered = res.name + " is now successfully registered.";        
+        var user = JSON.parse(this.response);
+        user.request = 'register'
+        if (!user.exception) {
+          user.registered = user.name + " is now successfully registered.";
         }
-        setCbUser(res);
-        dispatch({ type: 'REGISTER_RESPONSE', res });
+        dispatch({ type: 'REGISTER_RESPONSE', user });
       });
       xhr.send(JSON.stringify({
         name: document.querySelector("#register input[name=username]").value,
@@ -72,28 +89,55 @@ function App() {
     }
   }, []);
 
+  const loadApp = useMemo(() => (user) => {
+    user.loggedin = user.name + " is now successfully logged in.";
+    setCbUser(user);
+    loadProducts();
+    setTimeout(() => {
+      dispatch({ type: 'UPDATE_BANNER', showBanner: false });
+    }, 3000); 
+  }, [])
+
   const login = useMemo(() => {
     return (event) => {
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "http://localhost:8080/login");
       xhr.setRequestHeader("content-type", "application/json");
+      xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
-        var res = JSON.parse(this.response);
-        res.request = 'login'
-        if (!res.exception) {
-          res.loggedin = res.name + " is now successfully logged in.";
+        var user = JSON.parse(this.response);
+        user.request = 'login'
+        if (!user.exception) {
+          sessionStorage.cbUserId = user.id;
+          sessionStorage.cbAccessToken = user.accessToken;
+          loadApp(user);
         }
-        setCbUser(res);
-        dispatch({ type: 'LOGIN_RESPONSE', res });
-        setTimeout(() => {
-          dispatch({ type: 'UPDATE_BANNER', showBanner: false });
-        }, 3000); 
+        dispatch({ type: 'LOGIN_RESPONSE', user });
       });
       xhr.send(JSON.stringify({
         name: document.querySelector("#login input[name=username]").value,
         password: document.querySelector("#login input[name=password]").value,
-        role: document.querySelector("#register input[name=role]").checked ? "ADMIN" : "CUSTOMER"
+        role: document.querySelector("#login input[name=role]").checked ? "ADMIN" : "CUSTOMER"
       }));
+    }
+  }, []);
+
+  // log-in with access token if exists
+  useEffect(() => {
+    var access_token = sessionStorage.cbAccessToken;
+    var id = sessionStorage.cbUserId;
+    if (access_token && id) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "http://localhost:8080/login/access-token/" + id + "/" + access_token);
+      xhr.setRequestHeader("content-type", "application/json");
+      xhr.withCredentials = true;
+      xhr.addEventListener('load', function() {
+        var user = JSON.parse(this.response);
+        if (user.id) {
+          loadApp(user);
+        }
+      });
+      xhr.send();
     }
   }, []);
 
@@ -114,10 +158,19 @@ function App() {
             <h1 className="vertical-segment">
               {cbUser.role} Portal
             </h1>
+            <ul>
+              {
+                state.products.map((product, i) => {
+                  return <li key={i}>{product.name}</li>
+                })
+              }
+            </ul>
             <div className="vertical-segment">
               Logout
             </div>
           </div>
+
+
         </main>
       </div> : 
 

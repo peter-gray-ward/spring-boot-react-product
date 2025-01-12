@@ -1,7 +1,12 @@
 package cb.products.app.user;
 
+import java.util.Enumeration;
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,9 +18,11 @@ import jakarta.servlet.http.HttpSession;
 @RestController
 public class AuthController {
     private AuthService authService;
+    private UserService userService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
     }
 
     @PostMapping("/register")
@@ -27,22 +34,41 @@ public class AuthController {
             User user = authService.handleRegistration(name, password, role);
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
-        System.out.println(name);
-        System.out.println(password);
         return new ResponseEntity<>(new User("Missing parameters."), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User userBody, HttpSession session) {
-
+        System.out.println("/login");
+        System.out.println("Session ID: " + session.getId());
         User user = authService.handleLogin(userBody.getName(), userBody.getPassword(), userBody.getRole());
 
         if (user.getException() == null) {
+            user.setAccessToken(UUID.randomUUID().toString());
             SessionUtil.login(session, user);
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
         
         return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/login/access-token/{id}/{accessToken}")
+    public ResponseEntity<User> loginAccessToken(@PathVariable String accessToken, @PathVariable Long id, HttpSession session) {
+        System.out.println("/login/access-token/{id}/{accessToken}");
+        System.out.println("Session ID: " + session.getId());
+
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String attributeName = attributeNames.nextElement();
+            Object attributeValue = session.getAttribute(attributeName);
+            System.out.println(attributeName + " = " + attributeValue);
+        }
+        Object sessionAccessToken = session.getAttribute(id + ".access_token");
+        if (sessionAccessToken == null || sessionAccessToken.toString().equals(accessToken) == false) {
+            return new ResponseEntity<>(new User("unauthenticated"), HttpStatus.OK);
+        }
+        User user = userService.findById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping("/logout")

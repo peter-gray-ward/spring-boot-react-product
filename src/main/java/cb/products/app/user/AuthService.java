@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -85,43 +84,38 @@ public class AuthService {
     }
 
     public User handleLogin(String name, String password, String role) {
-        String error = null;
-
         try {
+            System.out.println("Logging in " + name + ":" + password + "- " + role);
             User user = userService.findByUsername(name);
+            System.out.println(user);
 
-            if (user == null) {
+            if (user == null || user.getId() == null) {
                 return new User("User " + name + " does not exist.");
             }
+
+
+            System.out.println("found a user " + user.getName());
 
             boolean passwordMatches = false;
 
             try {
                 passwordMatches = AuthService.PasswordUtil.checkPassword(password, user.getPassword());
             } catch (Exception e) {
-                error = "Invalid password";
-                e.printStackTrace();
+                return new User("Invalid password");
             }
 
             if (role.equals(user.getRole()) == false) {
-                user.setException("Incorrect role");
-                return user;
+                return new User("Incorrect role");
             } else if (passwordMatches) {
                 String accessToken = UUID.randomUUID().toString();
                 user.setAccessToken(accessToken);
                 return user;
             } else {
-                error = "Incorrect password or name.";
-                user.setException(error);
-                return user;
+                return new User("Incorrect password or name.");
             }
-        } catch (EmptyResultDataAccessException e) {
-            error = "User " + name + " not found.";
         } catch (Exception e) {
-            e.printStackTrace();
+            return new User(e.getMessage());
         }
-
-        return null;
     }
 
     public void handleLogout(HttpServletRequest request, HttpServletResponse response) {

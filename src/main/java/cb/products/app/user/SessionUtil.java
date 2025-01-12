@@ -17,6 +17,8 @@ public class SessionUtil {
             String accessToken = user.getAccessToken();
             Long userId = user.getId();
             session.setAttribute(userId + ".access_token", accessToken);
+            session.setMaxInactiveInterval(600); // 10 minutes
+
         } catch (Exception e) {
             e.printStackTrace();
         }
