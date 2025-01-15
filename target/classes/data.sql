@@ -1,3 +1,4 @@
+
 -- Insert seed data for PRODUCT table
 INSERT INTO "PRODUCT" (name, price, description, image_id) VALUES
 ('Laptop', 999.99, 'High-performance laptop with 16GB RAM.', 1),
