@@ -143,11 +143,7 @@ function App() {
   }, [state.products]);
 
   const removeProduct = useMemo(() => event => {
-    var id = event.currentTarget;
-    while (id.id !== 'product') {
-      id = id.parentElement;
-    }
-    id = id.dataset.id;
+    var id = event.currentTarget.dataset.id;
     var xhr = new XMLHttpRequest();
     xhr.open("DELETE", host + "/products/" + id);
     xhr.withCredentials = true;
@@ -344,7 +340,7 @@ function App() {
 
                       <section className="actions">
                         <button>Purchase</button>
-                        <button onClick={removeProduct}>Remove</button>
+                        <button onClick={removeProduct} data-id={product.id}>Remove</button>
                         <button onClick={saveProduct}>save</button>
                         <button>
                                 <span>$</span>
