@@ -58,7 +58,7 @@ var props = {
 };
 
 function App() {
-  const host = useMemo(() => '',[]);
+  const host = useMemo(() => 'http://localhost:8080',[]);
   const [state, dispatch] = useReducer(PropsReducer, props);
   const [cbUser, setCbUser] = useState();
   const [product, setProduct] = useState();
@@ -227,7 +227,11 @@ function App() {
       xhr.setRequestHeader("content-type", "application/json");
       xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
-        var user = JSON.parse(this.response);
+        var user = {};
+        try {
+          user = JSON.parse(this.response);
+        } catch (err) {}
+       
         if (user.id) {
           loadApp(user);
         }
@@ -292,14 +296,12 @@ function App() {
                       
                       <h1 contentEditable dangerouslySetInnerHTML={{ __html: product.name }} 
                         onChange={handleProductInputChange} type="text" name="name"></h1>
+
+
                       <p contentEditable dangerouslySetInnerHTML={{ __html: product.description }}
                        onChange={handleProductInputChange} type="text" name="description"></p>
-                      <h2><span>$</span><input onChange={handleProductInputChange} name="price" className="currency" type="number" value={product.price} /></h2>
-                      <section className="actions">
-                        <button>Purchase</button>
-                        <button onClick={removeProduct}>Remove</button>
-                        <button onClick={saveProduct}>save</button>
-                      </section>
+                      
+                      
                     </div>
                   : 
                     <div id="product">
@@ -307,9 +309,6 @@ function App() {
                       <h1>{product.name}</h1>
                       <p>{product.description}</p>
                       <h2>${product.price}</h2>
-                      <section className="actions">
-                        <button>Purchase</button>
-                      </section>
                     </div>
 
                 :
@@ -322,7 +321,37 @@ function App() {
                   })
                 
               }
+
+
             </article>
+            {
+              product ? 
+                cbUser.role == 'ADMIN' 
+
+                  ? 
+
+                <section className="actions">
+                  <button>Purchase</button>
+                  <button onClick={removeProduct}>Remove</button>
+                  <button onClick={saveProduct}>save</button>
+                  <button>
+                          <span>$</span>
+                          <input onChange={handleProductInputChange} name="price" 
+                            className="currency" type="number" value={product.price} />
+                  </button>
+                </section>
+                  :
+                <section className="actions">
+                  <button>Purchase</button>
+                  <button>
+                          <span>$</span>
+                          <input disabled name="price" 
+                            className="currency" type="number" value={product.price} />
+                  </button>
+                </section>
+
+              : null
+            }
           </div>
 
         </main>
