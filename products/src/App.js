@@ -35,6 +35,11 @@ function PropsReducer(state, action) {
       ...state,
       products: action.products
     };
+  case 'GO_TO_PROFILE':
+    return {
+      ...state,
+      profile: true
+    }
   default:
     return state;
   }
@@ -42,6 +47,7 @@ function PropsReducer(state, action) {
 
 var props = {
   showBanner: true,
+  profile: false,
   user: {
     id: null,
     name: null,
@@ -52,6 +58,7 @@ var props = {
 };
 
 function App() {
+  const host = useMemo(() => 'http://localhost:8080',[]);
   const [state, dispatch] = useReducer(PropsReducer, props);
   const [cbUser, setCbUser] = useState();
   const [product, setProduct] = useState();
@@ -59,7 +66,7 @@ function App() {
 
   const loadProducts = useMemo(() => () => {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/products");
+    xhr.open("GET", host + "/products");
     xhr.withCredentials = true;
     xhr.addEventListener("load", function() {
       var res = JSON.parse(this.response);
@@ -72,7 +79,7 @@ function App() {
   const register = useMemo(() => {
     return (event) => {
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", "/register");
+      xhr.open("POST", host + "/register");
       xhr.setRequestHeader("content-type", "application/json");
       xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
@@ -109,7 +116,7 @@ function App() {
   const login = useMemo(() => {
     return (event) => {
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", "/login");
+      xhr.open("POST", host + "/login");
       xhr.setRequestHeader("content-type", "application/json");
       xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
@@ -130,6 +137,10 @@ function App() {
     }
   }, []);
 
+  const profile = useMemo(() => {
+    dispatch({ type: 'GO_TO_PROFILE' })
+  }, [])
+
   const selectProduct = useMemo(() => event => {
     var id = +event.currentTarget.id;
     setProduct(state.products.filter(p => p.id == id)[0]);
@@ -142,7 +153,7 @@ function App() {
     }
     id = id.dataset.id;
     var xhr = new XMLHttpRequest();
-    xhr.open("DELETE", "/products/" + id);
+    xhr.open("DELETE", host + "/products/" + id);
     xhr.withCredentials = true;
     xhr.addEventListener("load", function() {
       var res = JSON.parse(this.response);
@@ -158,7 +169,7 @@ function App() {
 
   const addProduct = useMemo(() => event => {
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/products");
+    xhr.open("POST", host + "/products");
     xhr.withCredentials = true;
     xhr.addEventListener("load", function() {
       var product = JSON.parse(this.response);
@@ -173,7 +184,7 @@ function App() {
 
   const saveProduct = useMemo(() => event => {
     var xhr = new XMLHttpRequest();
-    xhr.open("PUT", "/products/" + product.id);
+    xhr.open("PUT", host + "/products/" + product.id);
     xhr.setRequestHeader("content-type", "application/json");
     xhr.withCredentials = true;
     xhr.addEventListener("load", function() {
@@ -181,6 +192,10 @@ function App() {
       if (product.id) {
         state.products = state.products.map(p => {
           if (p.id == product.id) {
+            p.name = document.querySelector("div[data-id=\"" + p.id + "\"] h1").innerHTML
+            product.name = p.name
+            p.description = document.querySelector("div[data-id=\"" + p.id + "\"] p").innerHTML
+            product.description = p.description
             return product;
           }
           return p;
@@ -221,6 +236,8 @@ function App() {
     }
   }, []);
 
+
+
   return (
     <div className="App">
      {
@@ -246,6 +263,7 @@ function App() {
               }
             </ul>
             <div className="vertical-segment">
+              <a id="profile" onClick={profile}>Go to Profile</a>
               <a id="logout" onClick={logout}>Logout</a>
             </div>
           </div>
@@ -260,9 +278,11 @@ function App() {
                 </> : <a>All Products</a>
               }
             </div>
+            
             <article>
               {
                 product 
+
                 ? 
 
                   cbUser.role == 'ADMIN' 
@@ -270,8 +290,10 @@ function App() {
                   ? 
                     <div id="product" data-id={product.id}>
                       
-                      <h1><input onChange={handleProductInputChange} type="text" name="name" value={product.name} /></h1>
-                      <p><textarea onChange={handleProductInputChange} type="text" name="description" value={product.description} /></p>
+                      <h1 contentEditable dangerouslySetInnerHTML={{ __html: product.name }} 
+                        onChange={handleProductInputChange} type="text" name="name"></h1>
+                      <p contentEditable dangerouslySetInnerHTML={{ __html: product.description }}
+                       onChange={handleProductInputChange} type="text" name="description"></p>
                       <h2><span>$</span><input onChange={handleProductInputChange} name="price" className="currency" type="number" value={product.price} /></h2>
                       <section className="actions">
                         <button>Purchase</button>
@@ -295,7 +317,7 @@ function App() {
                   state.products.map((product, i) => {
                     return <div className="product-preview" onClick={selectProduct} id={product.id}>
                       <div className="thumbnail"></div>
-                      {product.name}
+                      <h2>{product.name}</h2>
                     </div>
                   })
                 
