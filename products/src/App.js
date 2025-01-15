@@ -241,7 +241,7 @@ function App() {
 
        ? 
 
-         <div id="root">
+         <div id="root" className={cbUser.role.toLowerCase()}>
           {
             state.showBanner ? <div id="banner">
               Welcome, {cbUser.name}
@@ -316,7 +316,6 @@ function App() {
                             
                             <h1>{product.name}</h1>
                             <p>{product.description}</p>
-                            <h2>${product.price}</h2>
                           </div>
 
                       :

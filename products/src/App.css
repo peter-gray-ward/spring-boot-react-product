@@ -242,10 +242,13 @@ div:focus-visible {
 #product p, #product h1 {
   width: calc(100% - 0.5rem);
   text-align: left;
-  border-bottom: 2px dotted;
-  background: lightyellow;
   padding: 0.25rem;
   box-sizing: border-box;
+}
+
+.admin #product p, .admin #product h1 {
+  border-bottom: 2px dotted;
+  background: lightyellow;
 }
 
 #product h1 {
