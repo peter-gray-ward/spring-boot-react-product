@@ -137,10 +137,6 @@ function App() {
     }
   }, []);
 
-  const profile = useMemo(() => {
-    dispatch({ type: 'GO_TO_PROFILE' })
-  }, [])
-
   const selectProduct = useMemo(() => event => {
     var id = +event.currentTarget.id;
     setProduct(state.products.filter(p => p.id == id)[0]);
@@ -223,7 +219,7 @@ function App() {
     var id = sessionStorage.cbUserId;
     if (access_token && id) {
       var xhr = new XMLHttpRequest();
-      xhr.open("GET", "/login/access-token/" + id + "/" + access_token);
+      xhr.open("GET", host + "/login/access-token/" + id + "/" + access_token);
       xhr.setRequestHeader("content-type", "application/json");
       xhr.withCredentials = true;
       xhr.addEventListener('load', function() {
@@ -245,170 +241,189 @@ function App() {
   return (
     <div className="App">
      {
-       cbUser ? <div id="root">
-        {
-          state.showBanner ? <div id="banner">
-            Welcome, {cbUser.name}
-          </div>  : null
-        }
+       cbUser 
 
-        <main style={{
-          height: state.showBanner ? `calc(100vh - 40px)` : `100%`
-        }}>
-          <div className="left-panel">
-            <h1 className="vertical-segment">
-              {cbUser.role} Portal
-            </h1>
-            <ul>
-              {
-                cbUser.role == 'ADMIN' ? 
-                  <li onClick={addProduct}>+ Add Product</li>
-                : null
-              }
-            </ul>
-            <div className="vertical-segment">
-              <a id="profile" onClick={profile}>Go to Profile</a>
-              <a id="logout" onClick={logout}>Logout</a>
+       ? 
+
+         <div id="root">
+          {
+            state.showBanner ? <div id="banner">
+              Welcome, {cbUser.name}
+            </div>  : null
+          }
+
+          <main style={{ height: state.showBanner ? `calc(100vh - 40px)` : `100%` }}>
+            <div className="left-panel">
+              <h1 className="vertical-segment">
+                {cbUser.role} Portal
+              </h1>
+              <ul>
+                {
+                  cbUser.role == 'ADMIN' ? 
+                    <li onClick={addProduct}>+ Add Product</li>
+                  : null
+                }
+              </ul>
+              <div className="vertical-segment">
+                {/*<a id="profile" onClick={() => dispatch({ type: 'GO_TO_PROFILE' })}>Go to Profile</a>*/}
+                <a id="logout" onClick={logout}>Logout</a>
+              </div>
             </div>
-          </div>
 
 
-          
-          <div id="product-view">
-            <div className="breadcrumbs">
-              {
-                product ? <>
-                  <a onClick={() => setProduct(null)}>All Products</a> <span>{">"}</span> <a>{product.name}</a>
-                </> : <a>All Products</a>
-              }
-            </div>
-            
-            <article>
-              {
-                product 
-
-                ? 
-
-                  cbUser.role == 'ADMIN' 
-
-                  ? 
-                    <div id="product" data-id={product.id}>
-                      
-                      <h1 contentEditable dangerouslySetInnerHTML={{ __html: product.name }} 
-                        onChange={handleProductInputChange} type="text" name="name"></h1>
-
-
-                      <p contentEditable dangerouslySetInnerHTML={{ __html: product.description }}
-                       onChange={handleProductInputChange} type="text" name="description"></p>
-                      
-                      
-                    </div>
-                  : 
-                    <div id="product">
-                      
-                      <h1>{product.name}</h1>
-                      <p>{product.description}</p>
-                      <h2>${product.price}</h2>
-                    </div>
-
-                :
-
-                  state.products.map((product, i) => {
-                    return <div className="product-preview" onClick={selectProduct} id={product.id}>
-                      <div className="thumbnail"></div>
-                      <h2>{product.name}</h2>
-                    </div>
-                  })
-                
-              }
-
-
-            </article>
             {
-              product ? 
-                cbUser.role == 'ADMIN' 
+              
+              state.profile
 
-                  ? 
+              ?
 
-                <section className="actions">
-                  <button>Purchase</button>
-                  <button onClick={removeProduct}>Remove</button>
-                  <button onClick={saveProduct}>save</button>
-                  <button>
-                          <span>$</span>
-                          <input onChange={handleProductInputChange} name="price" 
-                            className="currency" type="number" value={product.price} />
-                  </button>
-                </section>
-                  :
-                <section className="actions">
-                  <button>Purchase</button>
-                  <button>
-                          <span>$</span>
-                          <input disabled name="price" 
-                            className="currency" type="number" value={product.price} />
-                  </button>
-                </section>
+                <div>profile</div>
 
-              : null
+              :
+              
+                <div id="product-view">
+                  <div className="breadcrumbs">
+                    {
+                      product 
+
+                      ? 
+                        <>
+                          <a onClick={() => setProduct(null)}>All Products</a> <span>{">"}</span> <a>{product.name}</a>
+                        </> 
+                      : 
+                        <a>All Products</a>
+                    }
+                  </div>
+                  
+                  <article>
+                    {
+                      product 
+
+                      ? 
+
+                        cbUser.role == 'ADMIN' 
+
+                        ? 
+                          <div id="product" data-id={product.id}>
+                            
+                            <h1 contentEditable dangerouslySetInnerHTML={{ __html: product.name }} 
+                              onChange={handleProductInputChange} type="text" name="name"></h1>
+
+
+                            <p contentEditable dangerouslySetInnerHTML={{ __html: product.description }}
+                             onChange={handleProductInputChange} type="text" name="description"></p>
+                            
+                            
+                          </div>
+                        : 
+                          <div id="product">
+                            
+                            <h1>{product.name}</h1>
+                            <p>{product.description}</p>
+                            <h2>${product.price}</h2>
+                          </div>
+
+                      :
+
+                        state.products.map((product, i) => {
+                          return <div className="product-preview" onClick={selectProduct} id={product.id}>
+                            <div className="thumbnail"></div>
+                            <h2>{product.name}</h2>
+                          </div>
+                        })
+                      
+                    }
+
+
+                  </article>
+                  {
+                    product ? 
+                      cbUser.role == 'ADMIN' 
+
+                        ? 
+
+                      <section className="actions">
+                        <button>Purchase</button>
+                        <button onClick={removeProduct}>Remove</button>
+                        <button onClick={saveProduct}>save</button>
+                        <button>
+                                <span>$</span>
+                                <input onChange={handleProductInputChange} name="price" 
+                                  className="currency" type="number" value={product.price} />
+                        </button>
+                      </section>
+                        :
+                      <section className="actions">
+                        <button>Purchase</button>
+                        <button>
+                                <span>$</span>
+                                <input disabled name="price" 
+                                  className="currency" type="number" value={product.price} />
+                        </button>
+                      </section>
+
+                    : null
+                  }
+                </div>
+
             }
+          </main>
+         </div> 
+
+       : 
+
+        <div id="authentication">
+          <p><i>Returning user?</i></p>
+          <h1>Login</h1>
+          <div id="login">
+            <label for="username">Username:</label>
+            <input type="text" name="username" />
+            <label for="password">Password:</label>
+            <input type="text" name="password" />
+            <section>
+              <label for="role">Admin:</label>
+              <input type="checkbox" name="role" />
+            </section>
+            {
+              (state.user.request == 'login'
+              && state.user.loggedin) ? <p className="success">
+              {state.user.loggedin}
+              </p> : null
+            }
+            {
+              (state.user.request == 'login'
+              && state.user.exception) ? <p className="exception">
+              {state.user.exception}
+              </p> : null
+            }
+            <button onClick={login}>login</button>
           </div>
-
-        </main>
-      </div> : 
-
-      <div id="authentication">
-        <p><i>Returning user?</i></p>
-        <h1>Login</h1>
-        <div id="login">
-          <label for="username">Username:</label>
-          <input type="text" name="username" />
-          <label for="password">Password:</label>
-          <input type="text" name="password" />
-          <section>
-            <label for="role">Admin:</label>
-            <input type="checkbox" name="role" />
-          </section>
-          {
-            (state.user.request == 'login'
-            && state.user.loggedin) ? <p className="success">
-            {state.user.loggedin}
-            </p> : null
-          }
-          {
-            (state.user.request == 'login'
-            && state.user.exception) ? <p className="exception">
-            {state.user.exception}
-            </p> : null
-          }
-          <button onClick={login}>login</button>
+          <p><i>Otherwise,</i></p>
+          <h1>Register</h1>
+          <div id="register">
+            <label for="username">Username:</label>
+            <input type="text" name="username" />
+            <label for="password">Password:</label>
+            <input type="text" name="password" />
+            <section>
+              <label for="role">Admin:</label>
+              <input type="checkbox" name="role" />
+            </section>
+            {
+              (state.user.request == 'register'
+              && state.user.registered) ? <p className="success">
+              {state.user.registered}
+              </p> : null
+            }
+            {
+              (state.user.request == 'register'
+              && state.user.exception) ? <p className="exception">
+              {state.user.exception}
+              </p> : null
+            }
+            <button onClick={register}>register</button>
+          </div>
         </div>
-        <p><i>Otherwise,</i></p>
-        <h1>Register</h1>
-        <div id="register">
-          <label for="username">Username:</label>
-          <input type="text" name="username" />
-          <label for="password">Password:</label>
-          <input type="text" name="password" />
-          <section>
-            <label for="role">Admin:</label>
-            <input type="checkbox" name="role" />
-          </section>
-          {
-            (state.user.request == 'register'
-            && state.user.registered) ? <p className="success">
-            {state.user.registered}
-            </p> : null
-          }
-          {
-            (state.user.request == 'register'
-            && state.user.exception) ? <p className="exception">
-            {state.user.exception}
-            </p> : null
-          }
-          <button onClick={register}>register</button>
-        </div>
-      </div>
      }
     </div>
   );
