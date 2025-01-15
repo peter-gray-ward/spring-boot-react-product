@@ -58,7 +58,7 @@ var props = {
 };
 
 function App() {
-  const host = useMemo(() => 'http://localhost:8080',[]);
+  const host = useMemo(() => '',[]);
   const [state, dispatch] = useReducer(PropsReducer, props);
   const [cbUser, setCbUser] = useState();
   const [product, setProduct] = useState();
