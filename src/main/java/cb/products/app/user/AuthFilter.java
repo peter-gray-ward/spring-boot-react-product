@@ -20,6 +20,7 @@ public class AuthFilter extends OncePerRequestFilter {
 
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
         "/login",
+        "/login/access-token",
         "/register",
         "/"
     );
@@ -52,7 +53,7 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     private boolean isExcluded(String path) {
-        return EXCLUDED_PATHS.stream().anyMatch(path::equals);
+        return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
     }
 
     private boolean isAuthenticated(HttpServletRequest request, HttpSession session) {
