@@ -20,8 +20,12 @@ public class SessionUtil {
 
             // set client cookie
             Cookie cookie = new Cookie("cbUser", userId + "." + accessToken);
-            cookie.setMaxAge(60 * 60 * 24);           
+            cookie.setMaxAge(60 * 60 * 24); 
+            cookie.setSecure(true); // Only send over HTTPS
+            cookie.setHttpOnly(true); // Prevent access via JavaScript
             cookie.setPath("/");   
+
+            response.addHeader("Set-Cookie", cookie.getName() + "=" + cookie.getValue() + "; Path=/; HttpOnly; Secure; SameSite=Lax");
 
             // Add the cookie to the response
             response.addCookie(cookie);
