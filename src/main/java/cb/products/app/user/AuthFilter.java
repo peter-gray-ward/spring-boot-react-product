@@ -21,9 +21,7 @@ public class AuthFilter extends OncePerRequestFilter {
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
         "/login",
         "/register",
-        "/",
-        "/users",
-        "/products"
+        "/"
     );
 
     @Override
@@ -31,12 +29,20 @@ public class AuthFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         HttpSession session = request.getSession(false);
 
+
+        
+
         if (isExcluded(path)) {
+            System.out.println(path + " is excluded");
             filterChain.doFilter(request, response);
             return;
         }
 
+        System.out.println("Filtering path " + path);
+
         boolean authenticated = isAuthenticated(request, session);
+
+        System.out.println("authenticated: " + authenticated);
 
         if (authenticated) {
             filterChain.doFilter(request, response);
@@ -46,34 +52,41 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     private boolean isExcluded(String path) {
-        return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
+        return EXCLUDED_PATHS.stream().anyMatch(path::equals);
     }
 
     private boolean isAuthenticated(HttpServletRequest request, HttpSession session) {
         if (session == null) {
-            return false;
+            return false; // No session means the user is not authenticated
         }
 
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
-            Optional<Cookie> userIdCookie = Arrays.stream(cookies)
-                    .filter(c -> c.getName().equals("cbUserId"))
+            Optional<Cookie> cbUserCookie = Arrays.stream(cookies)
+                    .filter(c -> c.getName().equals("cbUser"))
                     .findFirst();
 
-            String userId = userIdCookie.map(Cookie::getValue).orElse(null);
-            if (userId != null) {
-                Optional<Cookie> accessTokenCookie = Arrays.stream(cookies)
-                        .filter(c -> c.getName().equals("cbAccessToken"))
-                        .findFirst();
+            if (cbUserCookie.isPresent()) {
+                String cbUserValue = cbUserCookie.get().getValue();
+                if (cbUserValue != null && cbUserValue.contains(".")) {
 
-                String accessToken = accessTokenCookie.map(Cookie::getValue).orElse(null);
+                    System.out.println("User has app cookie: " + cbUserValue);
 
-                if (accessToken != null && session.getAttribute(userId + ".access_token").equals(accessToken)) {
-                    return true;
+                    // Split the "cbUser" value into userId and accessToken
+                    String[] parts = cbUserValue.split("\\.", 2);
+                    String userId = parts[0];
+                    String accessToken = parts[1];
+
+                    // Validate session attribute
+                    Object sessionToken = session.getAttribute(userId + ".access_token");
+                    if (accessToken.equals(sessionToken)) {
+                        return true; // Authenticated
+                    }
                 }
             }
         }
 
-        return false;
+        return false; // Default to not authenticated
     }
+
 }
