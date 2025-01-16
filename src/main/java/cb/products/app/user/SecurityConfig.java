@@ -13,12 +13,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable() // Disable CSRF for testing; enable it in production
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/register", "/login", "/login/access-token/**", "/").permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin().disable();
+        .csrf().disable() // Disable CSRF (only for testing; enable in production!)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/", "/register", "/login", "/login/access-token/**").permitAll() // Allow public access
+            .anyRequest().authenticated() // Require authentication for other endpoints
+        )
+        .anonymous() // Enable anonymous access for unauthenticated users
+        .and()
+        .formLogin().disable(); // Disable default form login
+    
 
         return http.build();
     }
