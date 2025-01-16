@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 
 @Configuration
 public class SecurityConfig {
@@ -13,14 +14,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-        .csrf().disable() // Disable CSRF (only for testing; enable in production!)
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/register", "/login", "/login/access-token/**").permitAll() // Allow public access
-            .anyRequest().authenticated() // Require authentication for other endpoints
-        )
-        .anonymous() // Enable anonymous access for unauthenticated users
-        .and()
-        .formLogin().disable(); // Disable default form login
+            .csrf().disable() 
+            .authorizeHttpRequests(auth -> auth 
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // Allow access to static resources 
+                .requestMatchers("/", "/register", "/login", "/login/access-token/**").permitAll() 
+                .anyRequest().authenticated() 
+            ) 
+            .anonymous() 
+            .and() 
+            .formLogin()
+            .disable();
     
 
         return http.build();
