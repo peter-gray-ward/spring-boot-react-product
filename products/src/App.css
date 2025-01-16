@@ -344,14 +344,22 @@ div:focus-visible {
 }
 
 
-.actions button {
+#authentication input, #authentication label {
+  font-size: 1.5vw;
+}
+#authentication button {
+  width: 15vw;
+  align-self: center;
+}
+
+.actions button, #authentication button {
   border: none;
   background: teal;
   color: white;
   justify-content: center;
 }
 
-.actions button:hover {
+.actions button:hover,  #authentication button:hover {
   cursor: pointer;
   color: yellow;
 }

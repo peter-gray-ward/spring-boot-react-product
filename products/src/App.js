@@ -105,8 +105,7 @@ function App() {
   }, []);
 
   const logout = useMemo(() => () => {
-    delete sessionStorage.cbUserId;
-    delete sessionStorage.cbAccessToken;
+    document.cookie = "cbUser=; path=/; max-age=0;";
     window.location.reload();
   }, [cbUser]);
 

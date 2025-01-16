@@ -3,11 +3,12 @@ cb/products/app/product/ProductRepository.class
 cb/products/app/user/Admin.class
 cb/products/app/user/AuthService.class
 cb/products/app/user/Auth.class
-cb/products/app/user/AuthService$PasswordUtil.class
 cb/products/app/product/ProductController.class
 cb/products/app/user/UserController.class
+cb/products/app/user/AppUserDetailsService.class
 cb/products/app/user/SessionUtil.class
 cb/products/app/user/UserRepository.class
+cb/products/app/user/SecurityConfig.class
 cb/products/app/AppApplication.class
 cb/products/app/user/Customer.class
 cb/products/app/user/AuthFilter.class
