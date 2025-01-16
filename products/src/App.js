@@ -8,9 +8,15 @@ import React, {
   useMemo
 } from 'react';
 
-function Cookie(key) {
-  var cookies = document.cookie.split(';').filter(cookie => new RegExp("^" + key).test(cookie));
-  return cookies.length ? cookies[0] : null;
+function getCookieValue(cookieName) {
+  const cookies = document.cookie.split('; ');
+  for (let i = 0; i < cookies.length; i++) {
+      const [key, value] = cookies[i].split('=');
+      if (key === cookieName) {
+          return decodeURIComponent(value);
+      }
+  }
+  return null;
 }
 
 function PropsReducer(state, action) {
@@ -211,9 +217,9 @@ function App() {
 
   // log-in with access token if exists
   useEffect(() => {
-    var access_token = sessionStorage.cbAccessToken;
-    var id = sessionStorage.cbUserId;
-    if (access_token && id) {
+    var cookie = getCookieValue("cbUser");
+    if (cookie && /\d\.\w+/.test(cookie)) {
+      var [id, access_token] = cookie.split('.'); 
       var xhr = new XMLHttpRequest();
       xhr.open("GET", host + "/login/access-token/" + id + "/" + access_token);
       xhr.setRequestHeader("content-type", "application/json");

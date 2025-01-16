@@ -1,6 +1,5 @@
 package cb.products.app.user;
 
-import java.util.Enumeration;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -38,14 +37,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User userBody, HttpSession session) {
-        System.out.println("/login");
-        System.out.println("Session ID: " + session.getId());
+    public ResponseEntity<User> login(@RequestBody User userBody, HttpServletResponse response, HttpSession session) {
         User user = authService.handleLogin(userBody.getName(), userBody.getPassword(), userBody.getRole());
 
         if (user.getException() == null) {
             user.setAccessToken(UUID.randomUUID().toString());
-            SessionUtil.login(session, user);
+            SessionUtil.login(response, session, user);
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
         
@@ -54,15 +51,6 @@ public class AuthController {
 
     @GetMapping("/login/access-token/{id}/{accessToken}")
     public ResponseEntity<User> loginAccessToken(@PathVariable String accessToken, @PathVariable Long id, HttpSession session) {
-        System.out.println("/login/access-token/{id}/{accessToken}");
-        System.out.println("Session ID: " + session.getId());
-
-        Enumeration<String> attributeNames = session.getAttributeNames();
-        while (attributeNames.hasMoreElements()) {
-            String attributeName = attributeNames.nextElement();
-            Object attributeValue = session.getAttribute(attributeName);
-            System.out.println(attributeName + " = " + attributeValue);
-        }
         Object sessionAccessToken = session.getAttribute(id + ".access_token");
         if (sessionAccessToken == null || sessionAccessToken.toString().equals(accessToken) == false) {
             return new ResponseEntity<>(new User("unauthenticated"), HttpStatus.OK);
