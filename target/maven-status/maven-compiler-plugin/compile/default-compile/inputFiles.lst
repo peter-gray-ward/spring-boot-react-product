@@ -9,7 +9,6 @@
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/AppUserDetailsService.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/Auth.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/AuthController.java
-/Users/peter/Desktop/app/src/main/java/cb/products/app/user/AuthFilter.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/AuthService.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/Customer.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/SecurityConfig.java
