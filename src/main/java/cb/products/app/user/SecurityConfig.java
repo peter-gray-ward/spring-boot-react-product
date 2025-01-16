@@ -15,11 +15,11 @@ public class SecurityConfig {
         http
             .csrf().disable() // Disable CSRF for testing; enable it in production
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/register", "/login", "/login/access-token/**", "/").permitAll()
+                .requestMatchers("/register", "/login", "/login/access-token/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin().disable() // Disable default form login if you're using custom login endpoints
-            .httpBasic(); // Enable basic HTTP authentication
+            ;
 
         return http.build();
     }
