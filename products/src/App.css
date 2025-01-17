@@ -299,7 +299,15 @@ div:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis; /* Show ellipsis for overflowing text */
   transition: 0.15s linear all;
-  word-break: brea-word;
+  word-break: break-word;
+}
+
+.product-preview h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: normal;
+  font-size: 2.5vw;
 }
 
 .product-preview:hover {

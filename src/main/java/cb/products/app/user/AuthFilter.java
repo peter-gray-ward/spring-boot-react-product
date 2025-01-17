@@ -22,7 +22,9 @@ public class AuthFilter extends OncePerRequestFilter {
         "/login",
         "/login/access-token",
         "/register",
-        "/"
+        "/actuator",
+        "/authentication",
+        "/static"
     );
 
     @Override
@@ -53,6 +55,9 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     private boolean isExcluded(String path) {
+        if (path.equals("/")) {
+            return true;
+        }
         return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
     }
 
