@@ -184,6 +184,7 @@ function App() {
     xhr.open("PUT", host + "/products/" + product.id);
     xhr.setRequestHeader("content-type", "application/json");
     xhr.withCredentials = true;
+    xhr.credentials = "include";
     xhr.addEventListener("load", function() {
       var product = JSON.parse(this.response);
       if (product.id) {

@@ -8,8 +8,6 @@ import jakarta.servlet.http.HttpSession;
 public class SessionUtil {
 
     public static void login(HttpServletResponse response, HttpSession session, User user) {
-        System.out.println("Logging into session");
-        
         try {
             String accessToken = user.getAccessToken();
             Long userId = user.getId();
@@ -20,7 +18,7 @@ public class SessionUtil {
 
             // set client cookie
             Cookie cookie = new Cookie("cbUser", userId + "." + accessToken);
-            cookie.setMaxAge(60 * 60 * 24);           
+            cookie.setMaxAge(60 * 60 * 24);       
             cookie.setPath("/");   
 
             // Add the cookie to the response

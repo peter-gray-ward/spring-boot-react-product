@@ -6,6 +6,10 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class AuthService {
 
     private UserService userService;
+    private final AuthenticationManager authenticationManager;
 
     public static class PasswordUtil {
         // Generate a hashed password
@@ -38,8 +43,9 @@ public class AuthService {
         }
     }
 
-    public AuthService(UserService userService) {
+    public AuthService(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
     }
 
     @Autowired
@@ -85,38 +91,37 @@ public class AuthService {
 
     public User handleLogin(String name, String password, String role) {
         try {
-            System.out.println("Logging in " + name + ":" + password + "- " + role);
+            // Authenticate using Spring Security
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(name, password)
+            );
+    
+            System.out.println("Handling Login");
+            System.out.println(authentication);
+            
+            // Fetch authenticated user
             User user = userService.findByUsername(name);
-            System.out.println(user);
-
             if (user == null || user.getId() == null) {
                 return new User("User " + name + " does not exist.");
             }
-
-
-            System.out.println("found a user " + user.getName());
-
-            boolean passwordMatches = false;
-
-            try {
-                passwordMatches = AuthService.PasswordUtil.checkPassword(password, user.getPassword());
-            } catch (Exception e) {
-                return new User("Invalid password");
+    
+            // Check if the role matches
+            if (!role.equals(user.getRole())) {
+                return new User("Incorrect role for user " + name);
             }
-
-            if (role.equals(user.getRole()) == false) {
-                return new User("Incorrect role");
-            } else if (passwordMatches) {
-                String accessToken = UUID.randomUUID().toString();
-                user.setAccessToken(accessToken);
-                return user;
-            } else {
-                return new User("Incorrect password or name.");
-            }
+    
+            // Generate access token (replace with JWT in production)
+            String accessToken = UUID.randomUUID().toString();
+            user.setAccessToken(accessToken);
+    
+            return user;
         } catch (Exception e) {
-            return new User(e.getMessage());
+            return new User("Invalid username, password, or role.");
         }
     }
+    
+    
+    
 
     public void handleLogout(HttpServletRequest request, HttpServletResponse response) {
         //SessionUtil.handleLogout(request, response);

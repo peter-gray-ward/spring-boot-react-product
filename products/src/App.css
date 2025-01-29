@@ -330,7 +330,7 @@ div:focus-visible {
 
 .actions {
     position: absolute;
-    /* left: 30vw; */
+    width: 70vw;
     top: 90vh;
     display: flex;
     flex-direction: row;

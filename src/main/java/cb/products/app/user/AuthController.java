@@ -38,11 +38,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User userBody, HttpServletResponse response, HttpSession session) {
+        System.out.println("/login " + userBody.getName());
+
         User user = authService.handleLogin(userBody.getName(), userBody.getPassword(), userBody.getRole());
 
         if (user.getException() == null) {
             user.setAccessToken(UUID.randomUUID().toString());
+            
             SessionUtil.login(response, session, user);
+            
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
         
@@ -52,6 +56,8 @@ public class AuthController {
     @GetMapping("/login/access-token/{id}/{accessToken}")
     public ResponseEntity<User> loginAccessToken(@PathVariable String accessToken, @PathVariable Long id, HttpSession session) {
         Object sessionAccessToken = session.getAttribute(id + ".access_token");
+
+        System.out.println("/login/access-token/{id}/" + accessToken);
         if (sessionAccessToken == null || sessionAccessToken.toString().equals(accessToken) == false) {
             return new ResponseEntity<>(new User("unauthenticated"), HttpStatus.OK);
         }
