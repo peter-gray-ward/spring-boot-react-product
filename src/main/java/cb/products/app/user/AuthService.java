@@ -95,9 +95,7 @@ public class AuthService {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(name, password)
             );
-    
-            System.out.println("Handling Login");
-            System.out.println(authentication);
+
             
             // Fetch authenticated user
             User user = userService.findByUsername(name);

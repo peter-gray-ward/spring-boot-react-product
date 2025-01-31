@@ -9,8 +9,10 @@
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/Auth.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/AuthController.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/AuthService.java
+/Users/peter/Desktop/app/src/main/java/cb/products/app/user/CustomUserDetailsService.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/SessionUtil.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/User.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/UserController.java
+/Users/peter/Desktop/app/src/main/java/cb/products/app/user/UserCookieFilter.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/UserRepository.java
 /Users/peter/Desktop/app/src/main/java/cb/products/app/user/UserService.java

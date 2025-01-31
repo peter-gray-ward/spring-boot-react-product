@@ -6,6 +6,7 @@ cb/products/app/user/AuthService$PasswordUtil.class
 cb/products/app/product/ProductController.class
 cb/products/app/user/UserController.class
 cb/products/app/user/SessionUtil.class
+cb/products/app/user/UserCookieFilter.class
 cb/products/app/user/UserRepository.class
 cb/products/app/AppApplication.class
 cb/products/app/user/UserService.class

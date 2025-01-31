@@ -18,6 +18,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import cb.products.app.user.UserCookieFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -28,10 +30,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, UserCookieFilter userCookieFilter) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
             .csrf(csrf -> csrf.disable()) // Disable CSRF for API authentication
+            .addFilterBefore(userCookieFilter, org.springframework.security.web.context.SecurityContextPersistenceFilter.class)
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
                     "/",
@@ -42,10 +45,10 @@ public class SecurityConfig {
                     "/manifest.json",
                     "/login", 
                     "/register", 
-                    "/login/access-token/**", 
-                    "/products/**"
+                    "/login/access-token/**"
                 ).permitAll() // Allow login & register
-                .anyRequest().authenticated() // Secure other endpoints
+                .anyRequest().authenticated()
+
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
