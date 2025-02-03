@@ -247,7 +247,7 @@ function App() {
 
        ? 
 
-         <div id="root" className={cbUser.role.toLowerCase()}>
+         <div className={cbUser.role.toLowerCase()}>
           {
             state.showBanner ? <div id="banner">
               Welcome, {cbUser.name}

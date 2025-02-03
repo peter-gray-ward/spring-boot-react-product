@@ -12,6 +12,5 @@ cb/products/app/AppApplication.class
 cb/products/app/user/UserService.class
 cb/products/app/user/AuthController.class
 cb/products/app/user/User.class
-cb/products/app/WebConfig.class
 cb/products/app/product/Product.class
 cb/products/app/product/ProductService.class
