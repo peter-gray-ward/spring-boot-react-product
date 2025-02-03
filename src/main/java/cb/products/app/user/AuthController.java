@@ -4,6 +4,13 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +25,14 @@ import jakarta.servlet.http.HttpSession;
 public class AuthController {
     private AuthService authService;
     private UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthController(AuthService authService, UserService userService) {
+    public AuthController(AuthService authService, UserService userService, BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
         this.authService = authService;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/register")
@@ -37,20 +48,42 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User userBody, HttpServletResponse response, HttpSession session) {
+    public ResponseEntity<User> login(@RequestBody User userBody, HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         System.out.println("/login " + userBody.getName());
 
-        User user = authService.handleLogin(userBody.getName(), userBody.getPassword(), userBody.getRole());
+        try {
+            // User user = authService.handleLogin(userBody.getName(), userBody.getPassword(), userBody.getRole());
 
-        if (user.getException() == null) {
+            // if (user.getException() == null) {
+            //     user.setAccessToken(UUID.randomUUID().toString());
+                
+            //     SessionUtil.login(response, session, user);
+                
+            //     return new ResponseEntity<>(user, HttpStatus.OK);
+            // }
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userBody.getName(), userBody.getPassword())
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            request.getSession().setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext()
+            );
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = userService.findByUsername(userDetails.getUsername());
+
             user.setAccessToken(UUID.randomUUID().toString());
-            
+
+            request.getSession().setMaxInactiveInterval(10000);
+
             SessionUtil.login(response, session, user);
-            
+
             return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        
-        return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/login/access-token/{id}/{accessToken}")
